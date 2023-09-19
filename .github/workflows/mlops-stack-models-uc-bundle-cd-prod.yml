@@ -1,0 +1,34 @@
+# This GitHub workflow deploys Bundle resources (ML resource config and more)
+# defined under mlops_stack_models_uc/databricks-resources/*
+# and mlops_stack_models_uc/bundle.yml with prod environment configs,
+# when PRs are merged into the release branch
+name: Bundle Deployment for mlops-stack-models-uc Prod
+
+on:
+  push:
+    branches:
+      - 'release'
+  workflow_dispatch:
+
+defaults:
+  run:
+    working-directory: ./mlops_stack_models_uc
+
+env:
+  DATABRICKS_TOKEN: ${{ secrets.PROD_WORKSPACE_TOKEN }}
+
+jobs:
+  prod:
+    concurrency: mlops-stack-models-uc-prod-bundle-job
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v3
+      - uses: databricks/setup-cli@main
+      - name: Validate Bundle For Prod Environment
+        id: validate
+        run: |
+          databricks bundle validate -e prod
+      - name: Deploy Bundle to Prod Environment
+        id: deploy
+        run: |
+          databricks bundle deploy -e prod
