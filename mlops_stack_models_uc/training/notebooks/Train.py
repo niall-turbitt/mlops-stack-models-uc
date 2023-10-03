@@ -16,8 +16,8 @@
 
 
 # COMMAND ----------
-# DBTITLE 1, Notebook arguments
 
+# DBTITLE 1, Notebook arguments
 # List of input args needed to run this notebook as a job.
 # Provide them via DB widgets or notebook arguments.
 
@@ -45,26 +45,30 @@ dbutils.widgets.text(
 )
 
 # COMMAND ----------
-# DBTITLE 1,Define input and output variables
 
+# DBTITLE 1,Define input and output variables
 input_table_path = dbutils.widgets.get("training_data_path")
 experiment_name = dbutils.widgets.get("experiment_name")
 model_name = dbutils.widgets.get("model_name")
 
-# COMMAND ----------
-# DBTITLE 1, Set experiment
+model_name = "niall_prod.schema_name.mlops-stack-models-uc-model"
 
+# COMMAND ----------
+
+# DBTITLE 1, Set experiment
 import mlflow
 
 mlflow.set_experiment(experiment_name)
+mlflow.set_registry_uri('databricks-uc')
 
 # COMMAND ----------
-# DBTITLE 1, Load raw data
 
+# DBTITLE 1, Load raw data
 training_df = spark.read.format("delta").load(input_table_path)
 display(training_df)
 
 # COMMAND ----------
+
 # DBTITLE 1, Helper function
 from mlflow.tracking import MlflowClient
 import mlflow.pyfunc
@@ -86,8 +90,8 @@ def get_latest_model_version(model_name):
 # MAGIC Train a LightGBM model on the data, then log and register the model with MLflow.
 
 # COMMAND ----------
-# DBTITLE 1, Train model
 
+# DBTITLE 1, Train model
 import mlflow
 from sklearn.model_selection import train_test_split
 import lightgbm as lgb
@@ -115,11 +119,18 @@ num_rounds = 100
 model = lgb.train(param, train_lgb_dataset, num_rounds)
 
 # COMMAND ----------
+
 # DBTITLE 1, Log model and return output.
+# Take the first row of the training dataset as the model input example.
+input_example = X_train.iloc[[0]]
 
 # Log the trained model with MLflow
 mlflow.lightgbm.log_model(
-    model, artifact_path="lgb_model", registered_model_name=model_name,
+    model, 
+    artifact_path="lgb_model", 
+    # The signature is automatically inferred from the input example and its predicted output.
+    input_example=input_example,    
+    registered_model_name=model_name,
 )
 
 # The returned model URI is needed by the model deployment notebook.
