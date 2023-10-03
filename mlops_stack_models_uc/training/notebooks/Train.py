@@ -39,9 +39,9 @@ dbutils.widgets.text(
     label="MLflow experiment name",
 )
 
-# MLflow registered model name to use for the trained mode.
+# Unity Catalog registered model name to use for the trained mode.
 dbutils.widgets.text(
-    "model_name", "dev-mlops-stack-models-uc-model", label="Model Name"
+    "model_name", "dev.schema_name.mlops-stack-models-uc-model", label="Model Name"
 )
 
 # COMMAND ----------
