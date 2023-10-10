@@ -39,6 +39,7 @@ def deploy(model_uri, env):
                 Defaults to "dev"
     :return:
     """
+    print(f"Deployment running in env: {env}")
     _, model_name, version = model_uri.split("/")
     client = MlflowClient(registry_uri="databricks-uc")
     mv = client.get_model_version(model_name, version)
@@ -48,14 +49,15 @@ def deploy(model_uri, env):
             name=model_name,
             alias=target_alias, 
             version=version)
+        print(f"Assigned alias {target_alias} to model version {model_uri}.")
+        
         # remove "challenger" alias if assigning "champion" alias
-        if target_alias is "champion":
+        if target_alias == "champion":
+            print(f"Removing 'challenger' alias from model version {model_uri}.")
             client.delete_registered_model_alias(
                 name=model_name,
                 alias="challenger")
-    print(f"Deployment successful in env: {env}")
-    print(f"Assigned alias {target_alias} to model version {model_uri}")
-
+    
 
 if __name__ == "__main__":
     deploy(model_uri=sys.argv[1], env=sys.argv[2])
