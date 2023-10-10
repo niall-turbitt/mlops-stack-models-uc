@@ -32,6 +32,7 @@ dbutils.widgets.text("model_name", "", label="Model Name")
 # COMMAND ----------
 
 import os
+
 notebook_path =  '/Workspace/' + os.path.dirname(dbutils.notebook.entry_point.getDbutils().notebook().getContext().notebookPath().get())
 %cd $notebook_path
 
@@ -55,7 +56,8 @@ sys.path.append("../..")
 # COMMAND ----------
 
 # DBTITLE 1,Define input and output variables
-from utils import get_deployed_model_stage_for_env
+# from utils import get_deployed_model_stage_for_env
+from utils import get_deployed_model_alias_for_env
 
 env = dbutils.widgets.get("env")
 input_table_name = dbutils.widgets.get("input_table_name")
@@ -64,18 +66,30 @@ model_name = dbutils.widgets.get("model_name")
 assert input_table_name != "", "input_table_name notebook parameter must be specified"
 assert output_table_name != "", "output_table_name notebook parameter must be specified"
 assert model_name != "", "model_name notebook parameter must be specified"
-stage = get_deployed_model_stage_for_env(env)
-model_uri = f"models:/{model_name}/{stage}"
+# stage = get_deployed_model_stage_for_env(env)
+alias = get_deployed_model_alias_for_env(env)
+# model_uri = f"models:/{model_name}/{stage}"
+model_uri = f"models:/{model_name}@{alias}"
 
-# Get model version from stage
+# COMMAND ----------
+
+# # Get model version from stage
+# from mlflow import MlflowClient
+
+# model_version_infos = MlflowClient().search_model_versions("name = '%s'" % model_name)
+# model_version = max(
+#     int(version.version)
+#     for version in model_version_infos
+#     if version.current_stage == stage
+# )
+
+# Get model version from alias
 from mlflow import MlflowClient
 
-model_version_infos = MlflowClient().search_model_versions("name = '%s'" % model_name)
-model_version = max(
-    int(version.version)
-    for version in model_version_infos
-    if version.current_stage == stage
-)
+client = MlflowClient(registry_uri="databricks-uc")
+model_version = client.get_model_version_by_alias(model_name, alias)
+
+# COMMAND ----------
 
 # Get datetime
 from datetime import datetime
