@@ -10,10 +10,9 @@
 # * env (required):                 - Environment the notebook is run in (staging, or prod). Defaults to "staging".
 # * training_data_path (required)   - Path to the training data.
 # * experiment_name (required)      - MLflow experiment name for the training runs. Will be created if it doesn't exist.
-# * model_name (required)           - MLflow registered model name to use for the trained model. Will be created if it
-# *                                   doesn't exist.
+# * model_name (required)           - Three-level name (<catalog>.<schema>.<model_name>) to register the trained model in Unity Catalog. 
+#                                     Will be created if it doesn't exist.
 ##################################################################################
-
 
 # COMMAND ----------
 
@@ -51,7 +50,7 @@ input_table_path = dbutils.widgets.get("training_data_path")
 experiment_name = dbutils.widgets.get("experiment_name")
 model_name = dbutils.widgets.get("model_name")
 
-model_name = "niall_prod.schema_name.mlops-stack-models-uc-model"
+model_name = "niall_dev.schema_name.mlops-stack-models-uc-model"
 
 # COMMAND ----------
 

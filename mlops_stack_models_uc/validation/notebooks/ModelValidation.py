@@ -80,8 +80,6 @@ dbutils.widgets.text("model_version", "", "Candidate Model Version")
 
 # COMMAND ----------
 
-
-
 run_mode = dbutils.widgets.get("run_mode").lower()
 assert run_mode == "disabled" or run_mode == "dry_run" or run_mode == "enabled"
 
@@ -114,9 +112,6 @@ from mlflow.tracking.client import MlflowClient
 client = MlflowClient()
 
 experiment_name = dbutils.widgets.get("experiment_name")
-
-
-
 
 # set model evaluation parameters that can be inferred from the job
 model_uri = dbutils.jobs.taskValues.get("Train", "model_uri", debugValue="")
@@ -212,7 +207,6 @@ def log_to_model_description(run, success):
     client.update_model_version(
         name=model_name, version=model_version, description=description
     )
-
 
 # COMMAND ----------
 
