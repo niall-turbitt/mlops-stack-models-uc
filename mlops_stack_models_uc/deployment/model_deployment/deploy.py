@@ -48,7 +48,13 @@ def deploy(model_uri, env):
             name=model_name,
             alias=target_alias, 
             version=version)
-    print(f"Successfully deployed model with URI {model_uri} to {env}")
+        # remove "challenger" alias if assigning "champion" alias
+        if target_alias is "champion":
+            client.delete_registered_model_alias(
+                name=model_name,
+                alias="challenger")
+    print(f"Deployment successful in env: {env}")
+    print(f"Assigned alias {target_alias} to model version {model_uri}")
 
 
 if __name__ == "__main__":
