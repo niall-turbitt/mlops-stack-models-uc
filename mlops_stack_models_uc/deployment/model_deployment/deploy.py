@@ -2,13 +2,13 @@ import sys
 import pathlib
 
 sys.path.append(str(pathlib.Path(__file__).parent.parent.parent.resolve()))
-from utils import get_deployed_model_stage_for_env
+# from utils import get_deployed_model_stage_for_env
+from utils import get_deployed_model_alias_for_env
 from mlflow.tracking import MlflowClient
 
 
 # def deploy(model_uri, env):
-#     """
-#     Deploys an already-registered model produced by moving it into the appropriate stage for model deployment.
+#     """Deploys an already-registered model produced by moving it into the appropriate stage for model deployment.
 
 #     :param model_uri: URI of the model to deploy. Must be in the format "models:/<name>/<version-id>", as described in
 #                       https://www.mlflow.org/docs/latest/model-registry.html#fetching-an-mlflow-model-from-the-model-registry
@@ -47,10 +47,8 @@ def deploy(model_uri, env):
         client.set_registered_model_alias(
             name=model_name,
             alias=target_alias, 
-            version=1)
+            version=version)
     print(f"Successfully deployed model with URI {model_uri} to {env}")
-
-from utils import get_deployed_model_alias_for_env
 
 
 if __name__ == "__main__":
