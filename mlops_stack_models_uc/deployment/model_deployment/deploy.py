@@ -49,7 +49,7 @@ def deploy(model_uri, env):
             name=model_name,
             alias=target_alias, 
             version=version)
-        print(f"Assigned alias {target_alias} to model version {model_uri}.")
+        print(f"Assigned alias '{target_alias}' to model version {model_uri}.")
         
         # remove "challenger" alias if assigning "champion" alias
         if target_alias == "champion":
