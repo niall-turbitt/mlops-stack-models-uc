@@ -93,7 +93,7 @@ model_uri = f"models:/{model_name}@{alias}"
 from mlflow import MlflowClient
 
 client = MlflowClient(registry_uri="databricks-uc")
-model_version = client.get_model_version_by_alias(model_name, alias)
+model_version = client.get_model_version_by_alias(model_name, alias).version
 
 # COMMAND ----------
 
