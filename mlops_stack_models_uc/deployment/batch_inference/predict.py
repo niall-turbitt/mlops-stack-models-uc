@@ -9,6 +9,8 @@ def predict_batch(
     Apply the model at the specified URI for batch inference on the table with name input_table_name,
     writing results to the table with name output_table_name
     """
+    mlflow.set_registry_uri("databricks-uc")
+
     table = spark_session.table(input_table_name)
     
     predict = mlflow.pyfunc.spark_udf(

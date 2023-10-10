@@ -61,8 +61,14 @@ from utils import get_deployed_model_alias_for_env
 
 env = dbutils.widgets.get("env")
 input_table_name = dbutils.widgets.get("input_table_name")
+input_table_name = "niall_dev.schema_name.taxi_scoring_sample"
+
 output_table_name = dbutils.widgets.get("output_table_name")
+output_table_name = "niall_dev.schema_name.taxi_batch_inference"
+
 model_name = dbutils.widgets.get("model_name")
+model_name = "niall_dev.schema_name.mlops-stack-models-uc-model"
+
 assert input_table_name != "", "input_table_name notebook parameter must be specified"
 assert output_table_name != "", "output_table_name notebook parameter must be specified"
 assert model_name != "", "model_name notebook parameter must be specified"
