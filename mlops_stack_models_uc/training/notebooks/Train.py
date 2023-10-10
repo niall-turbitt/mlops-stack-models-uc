@@ -83,7 +83,6 @@ def get_latest_model_version(model_name):
             latest_version = version_int
     return latest_version
 
-
 # COMMAND ----------
 
 # MAGIC %md
