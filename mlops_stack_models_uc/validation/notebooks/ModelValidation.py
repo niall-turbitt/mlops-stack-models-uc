@@ -263,6 +263,9 @@ with mlflow.start_run(
                 )
         mlflow.log_artifact(metrics_file)
         log_to_model_description(run, True)
+        # Assign "challenger" alias to indicate model version has passed validation checks
+        print("Validation checks passed. Assigning 'challenger' alias to model version.")
+        client.set_registered_model_alias(model_name, "challenger", model_version)        
     except Exception as err:
         log_to_model_description(run, False)
         error_file = os.path.join(tmp_dir, "error.txt")
