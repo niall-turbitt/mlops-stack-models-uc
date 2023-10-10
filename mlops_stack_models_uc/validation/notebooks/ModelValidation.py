@@ -17,7 +17,7 @@
 #                                                            model to Production stage.
 #                                             * `enabled`  : Run the model validation notebook. Move model to Production stage only if all model validation
 #                                                            rules are passing.
-# * enable_baseline_comparison              - Whether to load the current registered "Production" stage model as baseline.
+# * enable_baseline_comparison              - Whether to load the current registered "Champion" model as baseline.
 #                                             Baseline model is a requirement for relative change and absolute change validation thresholds.
 # * validation_input                        - Validation input. Please refer to data parameter in mlflow.evaluate documentation https://mlflow.org/docs/latest/python_api/mlflow.html#mlflow.evaluate
 # * model_type                              - A string describing the model type. The model type can be either "regressor" and "classifier".
@@ -60,7 +60,6 @@ notebook_path =  '/Workspace/' + os.path.dirname(dbutils.notebook.entry_point.ge
 
 # COMMAND ----------
 
-
 dbutils.widgets.text(
     "experiment_name",
     "/dev-mlops-stack-models-uc-experiment",
@@ -69,13 +68,13 @@ dbutils.widgets.text(
 dbutils.widgets.dropdown("run_mode", "disabled", ["disabled", "dry_run", "enabled"], "Run Mode")
 dbutils.widgets.dropdown("enable_baseline_comparison", "false", ["true", "false"], "Enable Baseline Comparison")
 dbutils.widgets.text("validation_input", "SELECT * FROM delta.`dbfs:/databricks-datasets/nyctaxi-with-zipcodes/subsampled`", "Validation Input")
-
 dbutils.widgets.text("model_type", "regressor", "Model Type")
 dbutils.widgets.text("targets", "fare_amount", "Targets")
 dbutils.widgets.text("custom_metrics_loader_function", "custom_metrics", "Custom Metrics Loader Function")
 dbutils.widgets.text("validation_thresholds_loader_function", "validation_thresholds", "Validation Thresholds Loader Function")
 dbutils.widgets.text("evaluator_config_loader_function", "evaluator_config", "Evaluator Config Loader Function")
-dbutils.widgets.text("model_name", "dev-mlops-stack-models-uc-model", "Model Name")
+# dbutils.widgets.text("model_name", "dev-mlops-stack-models-uc-model", "Model Name")
+dbutils.widgets.text("model_name", "niall_dev.schema_name.mlops-stack-models-uc-model", "Model Name")
 dbutils.widgets.text("model_version", "", "Candidate Model Version")
 
 # COMMAND ----------
@@ -107,11 +106,10 @@ import os
 import tempfile
 import traceback
 
-from mlflow.tracking.client import MlflowClient
-
-client = MlflowClient()
-
 experiment_name = dbutils.widgets.get("experiment_name")
+
+mlflow.set_experiment(experiment_name)
+mlflow.set_registry_uri('databricks-uc')
 
 # set model evaluation parameters that can be inferred from the job
 model_uri = dbutils.jobs.taskValues.get("Train", "model_uri", debugValue="")
@@ -123,14 +121,13 @@ if model_uri == "":
     model_version = dbutils.widgets.get("model_version")
     model_uri = "models:/" + model_name + "/" + model_version
 
-baseline_model_uri = "models:/" + model_name + "/Production"
+# baseline_model_uri = "models:/" + model_name + "/Production"
+baseline_model_uri = "models:/" + model_name + "@champion"
+
 evaluators = "default"
 assert model_uri != "", "model_uri notebook parameter must be specified"
 assert model_name != "", "model_name notebook parameter must be specified"
 assert model_version != "", "model_version notebook parameter must be specified"
-
-# set experiment
-mlflow.set_experiment(experiment_name)
 
 # COMMAND ----------
 
@@ -170,6 +167,9 @@ validation_thresholds = validation_thresholds_loader_function()
 evaluator_config = evaluator_config_loader_function()
 
 # COMMAND ----------
+from mlflow.tracking.client import MlflowClient
+
+client = MlflowClient()
 
 # helper methods
 def get_run_link(run_info):
@@ -276,5 +276,3 @@ with mlflow.start_run(
             print(
                 "Model validation failed in DRY_RUN. It will not block model deployment."
             )
-
-# COMMAND ----------
