@@ -14,7 +14,7 @@ def predict_batch(
     table = spark_session.table(input_table_name)
     
     predict = mlflow.pyfunc.spark_udf(
-        spark_session, model_uri, result_type="string", env_manager="conda"
+        spark_session, model_uri, result_type="string", env_manager="virtualenv"
     )
     output_df = (
         table.withColumn("prediction", predict(struct(*table.columns)))
