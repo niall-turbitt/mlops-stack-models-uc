@@ -1,50 +1,59 @@
-# # Environment specific values
+# Environment specific values
 # environments:
 #   dev:
 #     resources:
-#       models:
+#       registered_models:
 #         model:
-#           description: MLflow registered model for the "mlops-stack-models-uc" ML Project for ${bundle.environment} environment.
+#           comment: Registered model in Unity Catalog for the "mlops-stack-models-uc" ML Project for ${bundle.environment} environment.
 
 #   test:
 #     resources:
-#       models:
+#       registered_models:
 #         model:
-#           description: MLflow registered model for the "mlops-stack-models-uc" ML Project for ${bundle.environment} environment.
+#           comment: Registered model in Unity Catalog for the "mlops-stack-models-uc" ML Project for ${bundle.environment} environment.
 
 #   staging:
 #     resources:
-#       models:
+#       registered_models:
 #         model:
-#           description: MLflow registered model for the "mlops-stack-models-uc" ML Project for ${bundle.environment} environment.
+#           comment: Registered model in Unity Catalog for the "mlops-stack-models-uc" ML Project for ${bundle.environment} environment.
 
 #   prod:
 #     resources:
-#       models:
+#       registered_models:
 #         model:
-#           description: |
-#             MLflow registered model for the "mlops-stack-models-uc" ML Project. See the corresponding [Git repo]($#{var.git_repo_url}) for details on the project.
+#           comment: |
+#             Registered model in Unity Catalog for the "mlops-stack-models-uc" ML Project. See the corresponding [Git repo]($#{var.git_repo_url}) for details on the project.
             
 #             Links:
 #               * [Git Repo]($#{var.git_repo_url}): contains ML code for the current project.
 #               * [Recurring model training job](https://e2-dogfood-ml-dev.staging.cloud.databricks.com#job/${resources.jobs.model_training_job.id}): trains fresh model versions using the latest ML code.
 #               * [Recurring batch inference job](https://e2-dogfood-ml-dev.staging.cloud.databricks.com#job/${resources.jobs.batch_inference_job.id}): applies the latest ${bundle.environment} model version for batch inference.
 
-# Allow users to read the model and experiment
+# Allow users to read the experiment
 permissions: &permissions
   permissions:
     - level: CAN_READ
       group_name: users
 
-# Defines model and experiments
+# Allow users to execute models in Unity Catalog
+# grants: &grants
+#   grants:
+#     - privileges:
+#         - EXECUTE
+#       principal: users
+
+# # Defines model and experiments
 resources:
-  # models:
-  #   model:
-  #     name: ${var.model_name}
-  #     <<: *permissions
-  #     depends_on:
-  #       - resources.jobs.model_training_job.id
-  #       - resources.jobs.batch_inference_job.id
+#   registered_models:
+#     model:
+#       name: ${var.model_name}
+#       catalog_name: niall_${bundle.environment}   # ${bundle.environment}
+#       schema_name: schema_name     
+#       <<: *grants
+#       depends_on:
+#         - resources.jobs.model_training_job.id
+#         - resources.jobs.batch_inference_job.id
 
   experiments:
     experiment:
